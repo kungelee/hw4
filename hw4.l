@@ -75,26 +75,25 @@
     )
 )
 
+
 ;; PART 1, #6: QUICKSORT
 ;; write quicksort for lisp; use PIVOT recursively to get a sorted list
 
+
+
 ;; PART 2, MATCH
 ;; shout-out to the TA + LISP slides for giving the pseudo code
-;(defun match(l1 l2)
-;    (cond 
-;        ((eq l1 nil) (format nil "T"))
-;        ((char-equal (car l1) ?)
-;            (match(rest l1) (rest l2))
-;        )
-;        ((char-equal (car l1) !)
-;            (if (match(rest l1) (rest l2))
-;                (format nil "T")
-;            )
-;        )
-;        ((char-equal (car l1) !) (match l1 (rest l2)))
-;        (t match(rest l1) (rest l2))
-;    )
-;)
+(defun match(l1 l2)
+    (cond 
+        ((or (null l1) (null l2)) (equal l1 l2))
+        ((eq (car l1) '?)
+            (match (cdr l1) (cdr l2))
+        )
+        ((and (eq (car l1) '!) (match (cdr l1) (cdr l2)) (format nil "T")))
+        ((eq (car l1) '!) (match l1 (cdr l2)))
+        ((eq (car l1) (car l2)) (match (cdr l1) (cdr l2)))
+    )
+)
 
 ;; PART 3, #1: MATRIX-ADD
 (defun matrix-add(m1 m2)
@@ -109,9 +108,11 @@
     )
 )
 
+
 ;; PART 3, #2: MATRIX-MULTIPLY
 (defun matrix-multiply (m1 m2)
 )
+
 
 ;; PART 3, #3: MATRIX-TRANSPOSE
 (defun matrix-transpose(m1)
@@ -123,8 +124,6 @@
         (format nil "~a" flippedM1) ; else
     )
 )
-
-
 
 
 
