@@ -1,2 +1,1 @@
-lisp sucks
-dont use it
+lisp is okay i guess
