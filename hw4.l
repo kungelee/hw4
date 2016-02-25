@@ -19,15 +19,69 @@
 
 ;; PART 1, #2: SPLIT-LIST
 ;; split a list using the given atom as the delimitter
+(defun split-list (a l)    
+    (setq currentL '())
+    (setq finalL '())
 
+    (loop for e in l do   
+        ;;(format t "e = ~s ~%" e)
+        ;;if
+        (cond ( (eq e a)
+                   ;;(format t "e == a; appending cL to fL ~%")
+            (cond ( (not (eq currentL '()))      
+                    ;;append current list to final list
+                    ;;(format t "appending currentL to finalL ~%")
+                    (cond 
+                        ((eq finalL '() ) (push currentL finalL))
+                        (t (push currentL (cdr (last finalL))))
+                    )
+                   ;;clear current list              
+                   ;;(format t "clearing currentL ~%")
+                   (setq currentL '())
+                )
+              )
+             )
+                
+                ;;else
+                (t
+                    (cond
+                            ((eq currentL '() )
+                                ;;( format t "setting cL to e ~%" )
+                                (push e currentL)
+                            )
+                        ;;append element to current list
+                        ( t
+                           ;;(format t "appending e to cL ~%")
+                           (push e (cdr (last currentL)))                  
+                        )
+                    )   
+                )
+            )
+        )
+
+    (cond (
+        (not (eq currentL '()))
+        (cond 
+                ( (eq finalL '() )
+                     (push currentL finalL)
+                )
+                (t 
+                    (push currentL (cdr (last finalL)))
+                )
+        )                  
+        )
+    )    
+    finalL
+)
+    
 
 ;; PART 1, #3: RANGE
 ;; returns smallest, mean, and largest number in the list
 (defun range (l)
     ;; smallest
     (if (/= (length l) 0)
-        (setq minL (apply 'min l)) ;then statement
-        (setq minL nil) ;else statement
+        (setq minL (apply 'min l))
+        (setq minL nil)
     )
     
     ;; mean: add all elements together, then divide by length
@@ -49,18 +103,21 @@
 
 ;; PART 1, #4: SEARCH-COUNT
 ;; returns the number of times an atom occurs in a list
-;int search-count(e, l)
-;    if e equals car(l)
-;        return 1 + search-count(e, cdr(l))
-;    else
-;        return search-count(e, cdr(l))
-;add terminating condition
-;add null check
+(defun search-count (a l)
+    (setf count 0)
+    (loop for e in l do
+        (cond
+            ((eq e a) (setf count (+ 1 count)))
+        )
+    )
+    count
+)
 
 ;; PART 1, #5: PIVOT
 ;; takes a list l and an int n; splits it so that one list has all int < n 
 ;; and the other list has all int > n
 (defun pivot(n l)
+    (if (null l) nil)
     (setq lessThanN '())
     (setq greaterThanN '())
     (dotimes (var (length l))
@@ -69,17 +126,26 @@
             (setq greaterThanN (append greaterThanN (list (nth var l)))) ;else
         )
     )
-    (if (/= (length l) 0)
-        (format nil "(~a ~a)" lessThanN greaterThanN)
-        (format nil "(~a ~a)" nil nil)
-    )
+    (list lessThanN greaterThanN)
 )
-
 
 ;; PART 1, #6: QUICKSORT
 ;; write quicksort for lisp; use PIVOT recursively to get a sorted list
 
-
+(defun quicksort(l)
+    (cond
+        ((null l) 
+            nil
+        )
+        (t
+            (append
+                (quicksort ( car (pivot (car l) (cdr l)) ))
+                (cons (car l) nil)
+                (quicksort ( cdr ( pivot (car l) (cdr l) ) ))
+            )
+        )
+    )
+)
 
 ;; PART 2, MATCH
 ;; shout-out to the TA + LISP slides for giving the pseudo code
@@ -108,11 +174,58 @@
     )
 )
 
-
 ;; PART 3, #2: MATRIX-MULTIPLY
-(defun matrix-multiply (m1 m2)
-)
 
+;;(defun dot-product(a b) (reduce #'+ (mapcar #'* a b)))
+(defun dot-product (a b) 
+    (loop for p in a as q in b 
+          sum (* p q)))
+  
+(defun matrix-multiply (m1 m2)
+    (cond 
+        ((eq m1 nil) nil)
+        ((eq m2 nil) nil)
+        ;;transpose m2
+        (t
+        (setq trM2 (apply 'mapcar (lambda (&rest newList) (apply 'list newList)) m2))
+        (setq multMatr '())
+        
+        (loop for r in m1 do
+            (setq row '())
+            ;;(format t "row is now ~a ~%" row)
+
+            (loop for c in trM2 do
+                (setf dP (dot-product r c) )
+                ;;(format t "dot product is ~a ~%" dP)
+                (cond
+                    ((eq row nil)
+                        (push dP row)
+                    )
+                    (t
+                        (push dP (cdr (last row)))
+                    )
+                )
+                ;;(append row (list dP))
+                (format t "row is now ~a ~%" row)
+            )
+            (cond
+                
+                ((eq row '() )
+                    (push row multMatr)
+                )
+                ( t
+                    (push row (cdr (last multMatr)))                  
+                )
+            )
+            ;;(format t "just pushed row ~a to multmatr ~%" row)
+        )
+        multMatr
+        
+        
+        )
+    )
+    
+)
 
 ;; PART 3, #3: MATRIX-TRANSPOSE
 (defun matrix-transpose(m1)
@@ -124,10 +237,3 @@
         (format nil "~a" flippedM1) ; else
     )
 )
-
-
-
-
-
-
-
